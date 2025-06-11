@@ -1,6 +1,6 @@
 # 🏥 Sistema de Consultas Médicas
 
-Este projeto é uma API RESTful para gerenciamento de consultas médicas, desenvolvido como parte do meu portfólio. O sistema permite cadastrar e gerenciar **médicos, pacientes, especialidades, consultas** e **usuários com diferentes tipos de acesso**.
+Este projeto é uma API RESTful para gerenciamento de consultas médicas, desenvolvido como parte do meu portfólio. O sistema permite cadastrar e gerenciar **médicos, pacientes, especialidades, consultas** com **autenticação JWT**.
 
 ---
 
@@ -21,9 +21,9 @@ Este projeto é uma API RESTful para gerenciamento de consultas médicas, desenv
 
 ### 🔧 Back-End
 
-- **.NET 7 / .NET 8** com **C#**
+- **.NET 8** com **C#**
 - **Entity Framework Core**
-- **SQLite** como banco de dados local
+- **SQLite** como banco de dados local (possível trocar por outro banco de dados SQL)
 
 ### 🛠️ Padrões e Técnicas
 
@@ -31,8 +31,9 @@ Este projeto é uma API RESTful para gerenciamento de consultas médicas, desenv
 - Padrão **Repository** e **DTO (Data Transfer Object)**
 - Injeção de dependência
 - Separacão de camadas:
-  - `Dominio` (Entidades)
   - `Aplicacao` (Serviços e regras de negócio)
+  - `Comum` (Funções e utilitários)
+  - `Dominio` (Entidades)
   - `Repositorio` (Acesso a dados)
   - `WebAPI` (Camada de apresentação)
 
@@ -47,6 +48,7 @@ Este projeto é uma API RESTful para gerenciamento de consultas médicas, desenv
 ```
 ConsultasMedicas/
 ├── Aplicacao/
+├── Comum/
 ├── Dominio/
 ├── Repositorio/
 ├── WebAPI/
@@ -60,13 +62,13 @@ ConsultasMedicas/
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seuusuario/consultas-medicas.git
+   git clone https://github.com/tiroberto/Consultas-Medicas-API.git
    ```
 
 2. Acesse a pasta:
 
    ```bash
-   cd consultas-medicas
+   cd Consultas-Medicas-API
    ```
 
 3. Restaure os pacotes:
@@ -75,23 +77,30 @@ ConsultasMedicas/
    dotnet restore
    ```
 
-4. Crie a base de dados (opcional, se não usar Migrations):
-
-   ```bash
-   dotnet ef database update
-   ```
-
-5. Execute a aplicação:
+4. Execute a aplicação:
 
    ```bash
    dotnet run --project WebAPI
+   ```
+
+5. Login para testes:
+
+   ```json
+   {
+     "usuarioId": 0,
+     "nome": "",
+     "email": "admin@admin.com",
+     "senha": "admin123",
+     "tipoUsuarioId": 0
+   }
    ```
 
 ---
 
 ## 📄 Exemplos de Requisições JSON
 
-### 🔹 Marcar uma consulta: /consulta/salvar
+### 🔹 Marcar uma consulta: /Consulta/adicionar
+  - Deve-se adicionar o token de autenticação no header da requisição
 
 ```json
 {

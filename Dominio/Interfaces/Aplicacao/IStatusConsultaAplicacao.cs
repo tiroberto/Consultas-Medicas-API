@@ -10,7 +10,8 @@ namespace Dominio.Interfaces.Aplicacao
 {
     public interface IStatusConsultaAplicacao
     {
-        public NotificationResult Salvar(StatusConsultaDTO statusConsultaDTO);
+        public NotificationResult Adicionar(StatusConsultaDTO statusConsultaDTO);
+        public NotificationResult Atualizar(StatusConsultaDTO statusConsultaDTO);
         public NotificationResult ObterPorId(int id);
         public NotificationResult ObterTodos();
         public NotificationResult ExcluirPorId(int id);

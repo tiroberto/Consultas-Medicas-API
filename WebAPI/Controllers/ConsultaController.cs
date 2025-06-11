@@ -28,10 +28,13 @@ namespace WebAPI.Controllers
         public NotificationResult ObterPorId(int consultaId) => appConsulta.ObterPorId(consultaId);
 
         
-        [HttpPost("salvar")]
-        public NotificationResult Salvar(ConsultaDTO consultaDTO) => appConsulta.Salvar(consultaDTO);
+        [HttpPost("adicionar")]
+        public NotificationResult Adicionar(ConsultaDTO consultaDTO) => appConsulta.Adicionar(consultaDTO);
 
-        
+        [HttpPut("atualizar")]
+        public NotificationResult Atualizar(ConsultaDTO consultaDTO) => appConsulta.Atualizar(consultaDTO);
+
+
         [HttpDelete("excluir-por-id")]
         public NotificationResult ExcluirPorId(int consultaId) => appConsulta.ExcluirPorId(consultaId);
 

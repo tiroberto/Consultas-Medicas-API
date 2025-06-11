@@ -21,7 +21,7 @@ namespace Aplicacao
             _usuarioDominio = new Usuario();
         }
 
-        public NotificationResult Salvar (UsuarioDTO usuarioDTO)
+        public NotificationResult Adicionar (UsuarioDTO usuarioDTO)
         {
             var notificationResult = new NotificationResult();
             
@@ -36,43 +36,27 @@ namespace Aplicacao
                     TipoUsuario = new TipoUsuario { TipoUsuarioId = usuarioDTO.TipoUsuarioId }
                 };
                 _usuarioDominio.validarCampos(user, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if(user.UsuarioId == 0)
-                    {                  
+                    var usuarioExistente = _usuarioRepositorio.ObterPorEmail(user.Email);
                         
-                        var usuarioExistente = _usuarioRepositorio.ObterPorEmail(user.Email);
-                        
-                        if (usuarioExistente == null) 
-                        {
-                            user.SenhaHash = _usuarioDominio.GerarHashSenha(user.SenhaHash);
-                            user = _usuarioRepositorio.Adicionar(user);
+                    if (usuarioExistente == null) 
+                    {
+                        user.SenhaHash = _usuarioDominio.GerarHashSenha(user.SenhaHash);
+                        user = _usuarioRepositorio.Adicionar(user);
 
-                            if(user.UsuarioId > 0)
-                            {
-                                notificationResult.Result = user;
-                                notificationResult.Add("Usuário cadastrado com sucesso!");
-                                return notificationResult;
-                            }
-                        }
-                        else
-                        {                            
-                            notificationResult.Result = usuarioExistente;
-                            notificationResult.Add("Usuário já possui cadastro!");
+                        if(user.UsuarioId > 0)
+                        {
+                            notificationResult.Result = user;
+                            notificationResult.Add("Usuário cadastrado com sucesso!");
                             return notificationResult;
                         }
                     }
                     else
-                    {
-                        user.SenhaHash = _usuarioDominio.GerarHashSenha(user.SenhaHash);
-                        user = _usuarioRepositorio.Atualizar(user);
-
-                        if(user != null)
-                        {
-                            notificationResult.Result = user;
-                            notificationResult.Add("Dados do usuário atualizados com sucesso!");
-                            return notificationResult;
-                        }
+                    {   
+                        notificationResult.Add("Usuário já possui cadastro!");
+                        return notificationResult;
                     }
                 }
                                 
@@ -81,6 +65,53 @@ namespace Aplicacao
             catch (Exception ex) 
             {
                 return notificationResult.Add(new NotificationError(ex.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(UsuarioDTO usuarioDTO)
+        {
+            var notificationResult = new NotificationResult();
+
+            try
+            {
+                var user = new Usuario
+                {
+                    UsuarioId = usuarioDTO.UsuarioId,
+                    Nome = usuarioDTO.Nome,
+                    Email = usuarioDTO.Email,
+                    SenhaHash = usuarioDTO.Senha,
+                    TipoUsuario = new TipoUsuario { TipoUsuarioId = usuarioDTO.TipoUsuarioId }
+                };
+                _usuarioDominio.validarCampos(user, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var usuarioExistente = _usuarioRepositorio.ObterPorId(user.UsuarioId);
+
+                    if (usuarioExistente != null) 
+                    {
+                        user.SenhaHash = _usuarioDominio.GerarHashSenha(user.SenhaHash);
+                        user = _usuarioRepositorio.Atualizar(user);
+
+                        if (user != null)
+                        {
+                            notificationResult.Result = user;
+                            notificationResult.Add("Dados do usuário atualizados com sucesso!");
+                            return notificationResult;
+                        }
+                    }
+                    else
+                    {
+                        notificationResult.Add("Usuário não possui cadastro!");
+                        return notificationResult;
+                    }
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
             }
         }
 

@@ -44,10 +44,13 @@ namespace WebAPI.Controllers
         public NotificationResult ObterPorEspecialidade(int especialidadeId) => appMedico.ObterPorEspecialidade(especialidadeId);
 
         
-        [HttpPost("salvar")]
-        public NotificationResult Salvar(MedicoDTO medicoDTO) => appMedico.Salvar(medicoDTO);
+        [HttpPost("adicionar")]
+        public NotificationResult Adicionar(MedicoDTO medicoDTO) => appMedico.Adicionar(medicoDTO);
 
-        
+        [HttpPut("atualizar")]
+        public NotificationResult Atualizar(MedicoDTO medicoDTO) => appMedico.Atualizar(medicoDTO);
+
+
         [HttpDelete("excluir-por-id")]
         public NotificationResult ExcluirPorId(int medicoId) => appMedico.ExcluirPorId(medicoId);
 

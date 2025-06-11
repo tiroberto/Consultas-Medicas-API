@@ -24,7 +24,7 @@ namespace Aplicacao
             _pacienteDominio = new Paciente();
         }
 
-        public NotificationResult Salvar(PacienteDTO pacienteDTO)
+        public NotificationResult Adicionar(PacienteDTO pacienteDTO)
         {
             var notificationResult = new NotificationResult();
 
@@ -39,41 +39,74 @@ namespace Aplicacao
                     Email = pacienteDTO.Email,
                     Telefone = pacienteDTO.Telefone
                 };
-
                 _pacienteDominio.ValidarCampos(paciente, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if (paciente.PacienteId == 0)
+                    var pacienteExistente = _pacienteRepositorio.VerificarExistenciaPaciente(paciente);
+                    
+                    if (!pacienteExistente)
                     {
-                        var pacienteExistente = _pacienteRepositorio.VerificarExistenciaPaciente(paciente);
+                        paciente = _pacienteRepositorio.Adicionar(paciente);
 
-                        if (!pacienteExistente)
+                        if (paciente.PacienteId > 0)
                         {
-                            paciente = _pacienteRepositorio.Adicionar(paciente);
-
-                            if (paciente.PacienteId > 0)
-                            {
-                                notificationResult.Result = paciente; 
-                                notificationResult.Add("Paciente cadastrado com sucesso!");
-                                return notificationResult;                                
-                            }
+                            notificationResult.Result = paciente; 
+                            notificationResult.Add("Paciente cadastrado com sucesso!");
+                            return notificationResult;                                
                         }
-                        else
+                    }
+                    else
+                    {
+                        notificationResult.Add("Paciente já cadastrado!");
+                        return notificationResult;
+                    }                    
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(PacienteDTO pacienteDTO)
+        {
+            var notificationResult = new NotificationResult();
+
+            try
+            {
+                var paciente = new Paciente
+                {
+                    PacienteId = pacienteDTO.PacienteId,
+                    Nome = pacienteDTO.Nome,
+                    CPF = pacienteDTO.CPF,
+                    DataNascimento = pacienteDTO.DataNascimento,
+                    Email = pacienteDTO.Email,
+                    Telefone = pacienteDTO.Telefone
+                };
+                _pacienteDominio.ValidarCampos(paciente, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var pacienteExistente = _pacienteRepositorio.ObterPorId(paciente.PacienteId);
+
+                    if (pacienteExistente != null)
+                    {
+                        pacienteExistente = _pacienteRepositorio.Atualizar(paciente);
+
+                        if (pacienteExistente != null)
                         {
-                            notificationResult.Add("Paciente já cadastrado!");
+                            notificationResult.Result = pacienteExistente;
+                            notificationResult.Add("Dados do paciente atualizados com sucesso!");
                             return notificationResult;
                         }
                     }
                     else
                     {
-                        paciente = _pacienteRepositorio.Atualizar(paciente);
-
-                        if(paciente != null)
-                        {
-                            notificationResult.Result = paciente;
-                            notificationResult.Add("Dados do paciente atualizados com sucesso!");
-                            return notificationResult;
-                        }
+                        notificationResult.Add("Paciente não encontrado!");
+                        return notificationResult;
                     }
                 }
 
