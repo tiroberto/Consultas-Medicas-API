@@ -1,11 +1,13 @@
-﻿using Dominio.Interfaces.Aplicacao;
-using Comum.NotificationPattern;
+﻿using Comum.NotificationPattern;
+using Dominio.Entidades;
+using Dominio.Interfaces.Aplicacao;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Dominio.Entidades;
 
 namespace WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TipoUsuarioController : ControllerBase
@@ -17,9 +19,11 @@ namespace WebAPI.Controllers
             appTipoUsuario = TipoUsuarioAplicacao;
         }
 
+        
         [HttpGet("obter-todos")]
         public NotificationResult ObterTodos() => appTipoUsuario.ObterTodos();
 
+        
         [HttpGet("obter-por-id")]
         public NotificationResult ObterPorId(int id) => appTipoUsuario.ObterPorId(id);
 

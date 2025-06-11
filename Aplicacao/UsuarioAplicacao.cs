@@ -32,7 +32,7 @@ namespace Aplicacao
                     UsuarioId = usuarioDTO.UsuarioId,
                     Nome = usuarioDTO.Nome,
                     Email = usuarioDTO.Email,
-                    SenhaHash = usuarioDTO.SenhaHash,
+                    SenhaHash = usuarioDTO.Senha,
                     TipoUsuario = new TipoUsuario { TipoUsuarioId = usuarioDTO.TipoUsuarioId }
                 };
                 _usuarioDominio.validarCampos(user, notificationResult);
@@ -100,15 +100,16 @@ namespace Aplicacao
                         var usuarioExistente = _usuarioRepositorio.ObterPorEmail(email);
                         var verificacaoSenha = _usuarioDominio.VerificarSenha(senhaDigitada, usuarioExistente.SenhaHash);
 
-                        if (usuarioExistente != null && verificacaoSenha)
+                        if (verificacaoSenha)
                         {
-                            notificationResult.Result = new { usuario = usuarioExistente, token = "" };
+                            notificationResult.Result = usuarioExistente;
                             notificationResult.Add("Login efetuado com sucesso.");
                             return notificationResult;
                         }
                         else 
                         {
-                            notificationResult.Add("Usuário não encontrado.");
+                            notificationResult.Result = usuarioExistente;
+                            notificationResult.Add("E-mail ou senha incorretos.");
                             return notificationResult;
                         }
                     }
