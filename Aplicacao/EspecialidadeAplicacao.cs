@@ -24,7 +24,7 @@ namespace Aplicacao
             _especialidadeDominio = new Especialidade();
         }
 
-        public NotificationResult Salvar(EspecialidadeDTO especialidadeDTO)
+        public NotificationResult Adicionar(EspecialidadeDTO especialidadeDTO)
         {
             var notificationResult = new NotificationResult();
             try
@@ -35,28 +35,27 @@ namespace Aplicacao
                     Nome = especialidadeDTO.Nome
                 };
                 _especialidadeDominio.ValidarCampos(especialidade, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if (especialidade.EspecialidadeId == 0)
+                    var especialidadeExistente = _especialidadeRepositorio.ObterPorNome(especialidade.Nome);
+
+                    if (especialidadeExistente == null)
                     {
-                        var especialidadeExistente = _especialidadeRepositorio.ObterPorNome(especialidade.Nome);
+                        especialidade = _especialidadeRepositorio.Adicionar(especialidade);
 
-                        if (especialidadeExistente == null)
+                        if(especialidade.EspecialidadeId > 0)
                         {
-                            especialidade = _especialidadeRepositorio.Adicionar(especialidade);
-
-                            if(especialidade.EspecialidadeId > 0)
-                            {
-                                notificationResult.Result = especialidade;
-                                notificationResult.Add("Especialidade adicionada com sucesso!");
-                                return notificationResult;
-                            }
-                        }
-                        else
-                        {
-                            notificationResult.Add("Especialidade já existente!");
+                            notificationResult.Result = especialidade;
+                            notificationResult.Add("Especialidade adicionada com sucesso!");
                             return notificationResult;
                         }
+                     
+                    else
+                    {
+                        notificationResult.Add("Especialidade já existente!");
+                        return notificationResult;
+                    }
 
                     }
                     else
@@ -69,6 +68,48 @@ namespace Aplicacao
                             notificationResult.Add("Especialidade atualizado com sucesso!");
                             return notificationResult;
                         }
+                    }
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(EspecialidadeDTO especialidadeDTO)
+        {
+            var notificationResult = new NotificationResult();
+            try
+            {
+                var especialidade = new Especialidade
+                {
+                    EspecialidadeId = especialidadeDTO.EspecialidadeId,
+                    Nome = especialidadeDTO.Nome
+                };
+                _especialidadeDominio.ValidarCampos(especialidade, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var especialidadeExistente = _especialidadeRepositorio.ObterPorNome(especialidade.Nome);
+
+                    if (especialidadeExistente != null)
+                    {
+                        especialidadeExistente = _especialidadeRepositorio.Atualizar(especialidadeExistente);
+
+                        if (especialidadeExistente != null)
+                        {
+                            notificationResult.Result = especialidadeExistente;
+                            notificationResult.Add("Especialidade atualizada com sucesso!");
+                            return notificationResult;
+                        }
+                    }
+                    else
+                    {
+                        notificationResult.Add("Especialidade não possui cadastro!");
+                        return notificationResult;
                     }
                 }
 

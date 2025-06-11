@@ -12,7 +12,8 @@ namespace Dominio.Interfaces.Aplicacao
 {
     public interface IMedicoAplicacao
     {
-        public NotificationResult Salvar(MedicoDTO medicoDTO);
+        public NotificationResult Adicionar(MedicoDTO medicoDTO);
+        public NotificationResult Atualizar(MedicoDTO medicoDTO);
         public NotificationResult ObterPorId(int id);
         public NotificationResult ObterPorCRM(string crm);
         public NotificationResult ObterPorEmail(string email);

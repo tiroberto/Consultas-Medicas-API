@@ -7,7 +7,8 @@ namespace Dominio.Interfaces.Aplicacao
 {
     public interface IUsuarioAplicacao
     {
-        public NotificationResult Salvar(UsuarioDTO usuarioDTO);
+        public NotificationResult Adicionar(UsuarioDTO usuarioDTO);
+        public NotificationResult Atualizar(UsuarioDTO usuarioDTO);
         public NotificationResult VerificarLogin(string email, string senhaDigitada);
         public NotificationResult ObterTodos();
         public NotificationResult ObterPorId(int id);

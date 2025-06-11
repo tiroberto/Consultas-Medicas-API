@@ -24,7 +24,7 @@ namespace Aplicacao
             _statusDominio = new StatusConsulta();
         }
 
-        public NotificationResult Salvar(StatusConsultaDTO statusConsultaDTO)
+        public NotificationResult Adicionar(StatusConsultaDTO statusConsultaDTO)
         {
             var notificationResult = new NotificationResult();
             try
@@ -34,41 +34,69 @@ namespace Aplicacao
                     StatusConsultaId = statusConsultaDTO.StatusConsultaId,
                     Nome = statusConsultaDTO.Nome
                 };
-
                 _statusDominio.ValidarCampos(status, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if (status.StatusConsultaId == 0)
+                    var statusExistente = _statusRepositorio.ObterPorNome(status.Nome);
+
+                    if (statusExistente == null)
                     {
-                        var statusExistente = _statusRepositorio.ObterPorNome(status.Nome);
+                        status = _statusRepositorio.Adicionar(status);
 
-                        if (statusExistente == null)
+                        if(status.StatusConsultaId > 0)
                         {
-                            status = _statusRepositorio.Adicionar(status);
-
-                            if(status.StatusConsultaId > 0)
-                            {
-                                notificationResult.Result = status;
-                                notificationResult.Add("Status adicionado com sucesso!");
-                                return notificationResult;                            }
-                        }
-                        else
-                        {
-                            notificationResult.Add("Status já existente!");
+                            notificationResult.Result = status;
+                            notificationResult.Add("Status adicionado com sucesso!");
                             return notificationResult;
                         }
-
                     }
                     else
                     {
+                        notificationResult.Add("Status já existente!");
+                        return notificationResult;
+                    }
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(StatusConsultaDTO statusConsultaDTO)
+        {
+            var notificationResult = new NotificationResult();
+            try
+            {
+                var status = new StatusConsulta
+                {
+                    StatusConsultaId = statusConsultaDTO.StatusConsultaId,
+                    Nome = statusConsultaDTO.Nome
+                };
+                _statusDominio.ValidarCampos(status, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var statusExistente = _statusRepositorio.ObterPorNome(status.Nome);
+                    
+                    if (statusExistente != null)
+                    {
                         status = _statusRepositorio.Atualizar(status);
-                        
-                        if(status != null)
+
+                        if (status != null)
                         {
                             notificationResult.Result = status;
-                            notificationResult.Add("Status atualizado com sucesso!");
+                            notificationResult.Add("Dados do status atualizado com sucesso!");
                             return notificationResult;
                         }
+                    }
+                    else
+                    {
+                        notificationResult.Add("Status não encontrado!");
+                        return notificationResult;
                     }
                 }
 

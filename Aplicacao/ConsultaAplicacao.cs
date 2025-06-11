@@ -23,7 +23,56 @@ namespace Aplicacao
             _consultaDominio = new Consulta();
         }
 
-        public NotificationResult Salvar(ConsultaDTO consultaDTO)
+        public NotificationResult Adicionar(ConsultaDTO consultaDTO)
+        {
+            var notificationResult = new NotificationResult();
+
+            try
+            {
+                var consulta = new Consulta
+                {
+                    ConsultaId = consultaDTO.ConsultaId,
+                    Paciente = new Paciente { PacienteId = consultaDTO.PacienteId },
+                    Medico = new Medico { MedicoId = consultaDTO.MedicoId },
+                    DataHoraInicio = consultaDTO.DataHoraInicio,
+                    DataHoraFim = consultaDTO.DataHoraFim,
+                    Observacoes = consultaDTO.Observacoes,
+                    StatusConsulta = new StatusConsulta { StatusConsultaId = consultaDTO.StatusConsultaId }
+                };
+                _consultaDominio.ValidarCampos(consulta, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var consultaExistente = _consultaRepositorio.ObterPorId(consulta.ConsultaId);
+
+                    if (consultaExistente == null)
+                    {
+                        consulta.StatusConsulta.StatusConsultaId = 1; //padrão 1=agendada                    
+                        consulta = _consultaRepositorio.Adicionar(consulta);
+
+                        if (consulta.ConsultaId > 0)
+                        {
+                            notificationResult.Result = consulta;
+                            notificationResult.Add("Consulta adicionada com sucesso!");
+                            return notificationResult;
+                        }                        
+                    }
+                    else
+                    {
+                        notificationResult.Result = consulta;
+                        notificationResult.Add("Consulta já existe!");
+                    }
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(ConsultaDTO consultaDTO)
         {
             var notificationResult = new NotificationResult();
 
@@ -41,21 +90,12 @@ namespace Aplicacao
                 };
 
                 _consultaDominio.ValidarCampos(consulta, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if (consulta.ConsultaId == 0)
-                    {
-                        consulta.StatusConsulta.StatusConsultaId = 1; //padrão 1=agendada                    
-                        consulta = _consultaRepositorio.Adicionar(consulta);
+                    var consultaExistente = _consultaRepositorio.ObterPorId(consulta.ConsultaId);
 
-                        if (consulta.ConsultaId > 0)
-                        {
-                            notificationResult.Result = consulta;
-                            notificationResult.Add("Consulta adicionada com sucesso!");
-                            return notificationResult;
-                        }                        
-                    }
-                    else
+                    if (consultaExistente != null)
                     {
                         consulta = _consultaRepositorio.Atualizar(consulta);
 
@@ -65,6 +105,11 @@ namespace Aplicacao
                             notificationResult.Add("Dados da consulta atualizados com sucesso!");
                             return notificationResult;
                         }
+                    }
+                    else
+                    {
+                        notificationResult.Add("Consulta inexistente!");
+                        return notificationResult;
                     }
                 }
 

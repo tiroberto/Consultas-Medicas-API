@@ -12,6 +12,7 @@ using System.Text;
 
 namespace WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
@@ -25,24 +26,21 @@ namespace WebAPI.Controllers
             _config = config;
         }
 
-//        [Authorize]
         [HttpGet("obter-todos")]
         public NotificationResult ObterTodos() => appUsuario.ObterTodos();
 
-        [Authorize]
         [HttpGet("obter-por-tipo-usuario")]
         public NotificationResult ObterPorTipoUsuario(int tipoUsuarioId) => appUsuario.ObterPorTipoUsuario(tipoUsuarioId);
 
-        [Authorize]
         [HttpGet("obter-por-id")]        
         public NotificationResult ObterPorId(int usuarioId) => appUsuario.ObterPorId(usuarioId);
+                
+        [HttpPost("adicionar")]
+        public NotificationResult Adicionar(UsuarioDTO usuarioDTO) => appUsuario.Adicionar(usuarioDTO);
 
-        [Authorize]
-        [AllowAnonymous]
-        [HttpPost("salvar")]
-        public NotificationResult Salvar(UsuarioDTO usuarioDTO) => appUsuario.Salvar(usuarioDTO);
+        [HttpPut("atualizar")]
+        public NotificationResult Atualizar(UsuarioDTO usuarioDTO) => appUsuario.Atualizar(usuarioDTO);
 
-        [Authorize]
         [HttpDelete("excluir-por-id")]
         public NotificationResult Excluir(int usuarioId) => appUsuario.ExcluirPorId(usuarioId);
         

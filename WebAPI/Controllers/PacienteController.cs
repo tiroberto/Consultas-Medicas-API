@@ -40,10 +40,13 @@ namespace WebAPI.Controllers
         public NotificationResult ObterPorId(int pacienteId) => appPaciente.ObterPorId(pacienteId);
 
         
-        [HttpPost("salvar")]
-        public NotificationResult Salvar(PacienteDTO pacienteDTO) => appPaciente.Salvar(pacienteDTO);
+        [HttpPost("adicionar")]
+        public NotificationResult Adicionar(PacienteDTO pacienteDTO) => appPaciente.Adicionar(pacienteDTO);
 
-        
+        [HttpPut("atualizar")]
+        public NotificationResult Atualizar(PacienteDTO pacienteDTO) => appPaciente.Atualizar(pacienteDTO);
+
+
         [HttpDelete("excluir-por-id")]
         public NotificationResult ExcluirPorId(int pacienteId) => appPaciente.ExcluirPorId(pacienteId);
     }

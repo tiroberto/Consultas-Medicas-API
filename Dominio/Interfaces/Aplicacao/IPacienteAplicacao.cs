@@ -11,7 +11,8 @@ namespace Dominio.Interfaces.Aplicacao
 {
     public interface IPacienteAplicacao
     {
-        public NotificationResult Salvar(PacienteDTO pacienteDTO);
+        public NotificationResult Adicionar(PacienteDTO pacienteDTO);
+        public NotificationResult Atualizar(PacienteDTO pacienteDTO);
         public NotificationResult ObterPorId(int id);
         public NotificationResult ObterPorCPF(string cpf);
         public NotificationResult ObterPorEmail(string email);

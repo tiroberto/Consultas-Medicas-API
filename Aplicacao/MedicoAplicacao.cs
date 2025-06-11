@@ -24,7 +24,7 @@ namespace Aplicacao
             _medicoDominio = new Medico();
         }
 
-        public NotificationResult Salvar(MedicoDTO medicoDTO)
+        public NotificationResult Adicionar(MedicoDTO medicoDTO)
         {
             var notificationResult = new NotificationResult();
 
@@ -39,41 +39,75 @@ namespace Aplicacao
                     Telefone = medicoDTO.Telefone,
                     Especialidade = new Especialidade { EspecialidadeId = medicoDTO.EspecialidadeId}
                 };
-
                 _medicoDominio.ValidarCampos(medico, notificationResult);
+
                 if (notificationResult.IsValid)
                 {
-                    if (medico.MedicoId == 0)
+                    var medicoExistente = _medicoRepositorio.VerificarExistenciaMedico(medico);
+
+                    if (!medicoExistente)
                     {
-                        var medicoExistente = _medicoRepositorio.VerificarExistenciaMedico(medico);
+                        medico = _medicoRepositorio.Adicionar(medico);
 
-                        if (!medicoExistente)
+                        if (medico.MedicoId > 0)
                         {
-                            medico = _medicoRepositorio.Adicionar(medico);
-
-                            if (medico.MedicoId > 0)
-                            {
-                                notificationResult.Result = medico;
-                                notificationResult.Add("Médico cadastrado com sucesso!");
-                                return notificationResult;
-                            }
+                            notificationResult.Result = medico;
+                            notificationResult.Add("Médico cadastrado com sucesso!");
+                            return notificationResult;
                         }
-                        else
-                        {
-                            notificationResult.Add("Médico já cadastrado!");
-                            return notificationResult;                            
-                        }
+                     
                     }
                     else
                     {
+                        notificationResult.Add("Médico já possui cadastro!");
+                        return notificationResult;                        
+                    }
+                }
+
+                return notificationResult;
+            }
+            catch (Exception e)
+            {
+                return notificationResult.Add(new NotificationError(e.Message));
+            }
+        }
+
+        public NotificationResult Atualizar(MedicoDTO medicoDTO)
+        {
+            var notificationResult = new NotificationResult();
+
+            try
+            {
+                var medico = new Medico
+                {
+                    MedicoId = medicoDTO.MedicoId,
+                    Nome = medicoDTO.Nome,
+                    CRM = medicoDTO.CRM,
+                    Email = medicoDTO.Email,
+                    Telefone = medicoDTO.Telefone,
+                    Especialidade = new Especialidade { EspecialidadeId = medicoDTO.EspecialidadeId }
+                };
+                _medicoDominio.ValidarCampos(medico, notificationResult);
+
+                if (notificationResult.IsValid)
+                {
+                    var medicoExistente = _medicoRepositorio.ObterPorId(medico.MedicoId);
+
+                    if (medicoExistente != null)
+                    {
                         medico = _medicoRepositorio.Atualizar(medico);
 
-                        if(medico != null)
+                        if (medico != null)
                         {
                             notificationResult.Result = medico;
                             notificationResult.Add("Dados do médico atualizados com sucesso!");
                             return notificationResult;
                         }
+                    }
+                    else
+                    {
+                        notificationResult.Add("Médico não encontrado!");
+                        return notificationResult;
                     }
                 }
 
